@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Application.Exceptions
 {
     [Serializable]
-    public class InvalidCollaboration : Exception
+    public class InvalidEvent : Exception
     {
         //
         // For guidelines regarding the creation of new exception types, see
@@ -13,16 +13,16 @@ namespace Application.Exceptions
         //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dncscol/html/csharp07192001.asp
         //
 
-        public InvalidCollaboration()
+        public InvalidEvent()
         { }
 
-        public InvalidCollaboration(string message) : base(message)
+        public InvalidEvent(string message) : base(message)
         { }
 
-        public InvalidCollaboration(string message, Exception inner) : base(message, inner)
+        public InvalidEvent(string message, Exception inner) : base(message, inner)
         { }
 
-        protected InvalidCollaboration(
+        protected InvalidEvent(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         { }
