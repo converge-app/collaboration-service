@@ -21,31 +21,30 @@ namespace Application.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class BiddingsController : ControllerBase
+    public class CollaborationsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IBidRepository _bidRepository;
-        private readonly IBidService _bidService;
+        private readonly ICollaborationRepository _collaborationRepository;
+        private readonly ICollaborationService _collaborationService;
 
-        public BiddingsController(IBidService bidService, IBidRepository bidRepository, IMapper mapper)
+        public CollaborationsController(ICollaborationService collaborationService, ICollaborationRepository collaborationRepository, IMapper mapper)
         {
-            _bidService = bidService;
-            _bidRepository = bidRepository;
+            _collaborationService = collaborationService;
+            _collaborationRepository = collaborationRepository;
             _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> OpenBid([FromBody] BidCreationDto bidDto)
+        public async Task<IActionResult> OpenCollaboration([FromBody] CollaborationCreationDto collaborationDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new
-                    {message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)});
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
-            var createBid = _mapper.Map<Bid>(bidDto);
+            var createCollaboration = _mapper.Map<Collaboration>(collaborationDto);
             try
             {
-                var createdBid = await _bidService.Open(createBid);
-                return Ok(createdBid);
+                var createdCollaboration = await _collaborationService.Open(createCollaboration);
+                return Ok(createdCollaboration);
             }
             catch (UserNotFound)
             {
@@ -61,22 +60,21 @@ namespace Application.Controllers
             }
         }
 
-        [HttpPut("{bidId}")]
-        public async Task<IActionResult> AcceptBid([FromHeader] string authorization, [FromRoute] string bidId, [FromBody] BidUpdateDto bidDto)
+        [HttpPut("{collaborationId}")]
+        public async Task<IActionResult> AcceptCollaboration([FromHeader] string authorization, [FromRoute] string collaborationId, [FromBody] CollaborationUpdateDto collaborationDto)
         {
-            if (bidId != bidDto.Id)
+            if (collaborationId != collaborationDto.Id)
                 return BadRequest(new MessageObj("Invalid id(s)"));
 
             if (!ModelState.IsValid)
-                return BadRequest(new
-                    {message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)});
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
-            var updateBid = _mapper.Map<Bid>(bidDto);
+            var updateCollaboration = _mapper.Map<Collaboration>(collaborationDto);
             try
             {
-                if (await _bidService.Accept(updateBid, authorization.Split(' ')[1]))
+                if (await _collaborationService.Accept(updateCollaboration, authorization.Split(' ') [1]))
                     return Ok();
-                throw new InvalidBid();
+                throw new InvalidCollaboration();
             }
             catch (Exception e)
             {
@@ -88,28 +86,27 @@ namespace Application.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
-            var bids = await _bidRepository.Get();
-            var bidDtos = _mapper.Map<IList<BidDto>>(bids);
-            return Ok(bidDtos);
+            var collaborations = await _collaborationRepository.Get();
+            var collaborationDtos = _mapper.Map<IList<CollaborationDto>>(collaborations);
+            return Ok(collaborationDtos);
         }
-
 
         [HttpGet("freelancer/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetByFreelancerId(string id)
         {
-            var bids = await _bidRepository.GetByFreelancerId(id);
-            var bidsDto = _mapper.Map<BidDto>(bids);
-            return Ok(bidsDto);
+            var collaborations = await _collaborationRepository.GetByFreelancerId(id);
+            var collaborationsDto = _mapper.Map<CollaborationDto>(collaborations);
+            return Ok(collaborationsDto);
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(string id)
         {
-            var bid = await _bidRepository.GetById(id);
-            var bidDto = _mapper.Map<BidDto>(bid);
-            return Ok(bidDto);
+            var collaboration = await _collaborationRepository.GetById(id);
+            var collaborationDto = _mapper.Map<CollaborationDto>(collaboration);
+            return Ok(collaborationDto);
         }
 
         [HttpDelete("{id}")]
@@ -117,7 +114,7 @@ namespace Application.Controllers
         {
             try
             {
-                await _bidRepository.Remove(id);
+                await _collaborationRepository.Remove(id);
             }
             catch (Exception e)
             {

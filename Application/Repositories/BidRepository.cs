@@ -6,76 +6,76 @@ using MongoDB.Driver;
 
 namespace Application.Repositories
 {
-    public interface IBidRepository
+    public interface ICollaborationRepository
     {
-        Task<List<Bid>> Get();
-        Task<Bid> GetById(string id);
-        Task<List<Bid>> GetByProject(string projectId);
-        Task<List<Bid>> GetByFreelancerId(string freelancerId);
-        Task<List<Bid>> GetByProjectAndFreelancer(string projectId, string freelancerId);
-        Task<Bid> Create(Bid bid);
-        Task Update(string id, Bid bidIn);
-        Task Remove(Bid bidIn);
+        Task<List<Collaboration>> Get();
+        Task<Collaboration> GetById(string id);
+        Task<List<Collaboration>> GetByProject(string projectId);
+        Task<List<Collaboration>> GetByFreelancerId(string freelancerId);
+        Task<List<Collaboration>> GetByProjectAndFreelancer(string projectId, string freelancerId);
+        Task<Collaboration> Create(Collaboration collaboration);
+        Task Update(string id, Collaboration collaborationIn);
+        Task Remove(Collaboration collaborationIn);
         Task Remove(string id);
     }
 
-    public class BidRepository : IBidRepository
+    public class CollaborationRepository : ICollaborationRepository
     {
-        private readonly IMongoCollection<Bid> _bids;
+        private readonly IMongoCollection<Collaboration> _collaborations;
 
-        public BidRepository(IDatabaseContext dbContext)
+        public CollaborationRepository(IDatabaseContext dbContext)
         {
             if (dbContext.IsConnectionOpen())
-                _bids = dbContext.Bids;
+                _collaborations = dbContext.Collaborations;
         }
 
-        public async Task<List<Bid>> Get()
+        public async Task<List<Collaboration>> Get()
         {
-            return await (await _bids.FindAsync(bid => true)).ToListAsync();
+            return await (await _collaborations.FindAsync(collaboration => true)).ToListAsync();
         }
 
-        public async Task<Bid> GetById(string id)
+        public async Task<Collaboration> GetById(string id)
         {
-            return await (await _bids.FindAsync(bidding => bidding.Id == id)).FirstOrDefaultAsync();
+            return await (await _collaborations.FindAsync(collaboration => collaboration.Id == id)).FirstOrDefaultAsync();
         }
 
-        public async Task<List<Bid>> GetByProject(string projectId)
+        public async Task<List<Collaboration>> GetByProject(string projectId)
         {
-            return await (await _bids.FindAsync(bid => bid.ProjectId == projectId)).ToListAsync();
+            return await (await _collaborations.FindAsync(collaboration => collaboration.ProjectId == projectId)).ToListAsync();
         }
 
-        public async Task<List<Bid>> GetByFreelancerId(string freelancerId)
+        public async Task<List<Collaboration>> GetByFreelancerId(string freelancerId)
         {
-            return await (await _bids.FindAsync(bid => bid.FreelancerId == freelancerId)).ToListAsync();
+            return await (await _collaborations.FindAsync(collaboration => collaboration.FreelancerId == freelancerId)).ToListAsync();
         }
 
-        public async Task<List<Bid>> GetByProjectAndFreelancer(string projectId, string freelancerId)
+        public async Task<List<Collaboration>> GetByProjectAndFreelancer(string projectId, string freelancerId)
         {
             return await (
-                await _bids.FindAsync(
-                    bid => bid.ProjectId == projectId && bid.FreelancerId == freelancerId)
+                await _collaborations.FindAsync(
+                    collaboration => collaboration.ProjectId == projectId && collaboration.FreelancerId == freelancerId)
             ).ToListAsync();
         }
 
-        public async Task<Bid> Create(Bid bid)
+        public async Task<Collaboration> Create(Collaboration collaboration)
         {
-            await _bids.InsertOneAsync(bid);
-            return bid;
+            await _collaborations.InsertOneAsync(collaboration);
+            return collaboration;
         }
 
-        public async Task Update(string id, Bid bidIn)
+        public async Task Update(string id, Collaboration collaborationIn)
         {
-            await _bids.ReplaceOneAsync(bidding => bidding.Id == id, bidIn);
+            await _collaborations.ReplaceOneAsync(collaboration => collaboration.Id == id, collaborationIn);
         }
 
-        public async Task Remove(Bid bidIn)
+        public async Task Remove(Collaboration collaborationIn)
         {
-            await _bids.DeleteOneAsync(bidding => bidding.Id == bidIn.Id);
+            await _collaborations.DeleteOneAsync(collaboration => collaboration.Id == collaborationIn.Id);
         }
 
         public async Task Remove(string id)
         {
-            await _bids.DeleteOneAsync(bidding => bidding.Id == id);
+            await _collaborations.DeleteOneAsync(collaboration => collaboration.Id == id);
         }
     }
 }

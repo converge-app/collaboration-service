@@ -15,39 +15,40 @@ using Newtonsoft.Json;
 
 namespace Application.Services
 {
-    public interface IBidService
+    public interface ICollaborationService
     {
-        Task<Bid> Open(Bid bid);
-        Task<bool> Accept(Bid bid, string authorizationToken);
+        Task<Collaboration> Open(Collaboration collaboration);
+        Task<bool> Accept(Collaboration collaboration, string authorizationToken);
     }
 
-    public class BidService : IBidService
+    public class CollaborationService : ICollaborationService
     {
-        private readonly IBidRepository _bidRepository;
+        private readonly ICollaborationRepository _collaborationRepository;
         private readonly IClient _client;
 
-        public BidService(IBidRepository bidRepository, IClient client)
+        public CollaborationService(ICollaborationRepository collaborationRepository, IClient client)
         {
-            _bidRepository = bidRepository;
+            _collaborationRepository = collaborationRepository;
             _client = client;
         }
 
-        public async Task<Bid> Open(Bid bid)
+        public async Task<Collaboration> Open(Collaboration collaboration)
         {
-            var project = await _client.GetProjectAsync(bid.ProjectId);
-            if (project == null) throw new InvalidBid();
+            var project = await _client.GetProjectAsync(collaboration.ProjectId);
+            if (project == null) throw new InvalidCollaboration();
 
-            var createdBid = await _bidRepository.Create(bid);
+            var createdCollaboration = await _collaborationRepository.Create(collaboration);
 
-            return createdBid ?? throw new InvalidBid();
+            return createdCollaboration ??
+                throw new InvalidCollaboration();
         }
 
-        public async Task<bool> Accept(Bid bid, string authorizationToken)
+        public async Task<bool> Accept(Collaboration collaboration, string authorizationToken)
         {
-            var project = await _client.GetProjectAsync(bid.ProjectId);
-            if (project == null) throw new InvalidBid("projectId invalid");
+            var project = await _client.GetProjectAsync(collaboration.ProjectId);
+            if (project == null) throw new InvalidCollaboration("projectId invalid");
 
-            project.FreelancerId = bid.FreelancerId;
+            project.FreelancerId = collaboration.FreelancerId;
 
             return await _client.UpdateProjectAsync(authorizationToken, project);
         }

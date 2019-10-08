@@ -8,10 +8,10 @@ namespace Application.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<Bid, BidDto>();
-            CreateMap<BidDto, Bid>();
-            CreateMap<BidUpdateDto, Bid>();
-            CreateMap<BidCreationDto, Bid>();
+            CreateMap<Collaboration, CollaborationDto>();
+            CreateMap<CollaborationDto, Collaboration>();
+            CreateMap<CollaborationUpdateDto, Collaboration>();
+            CreateMap<CollaborationCreationDto, Collaboration>();
         }
     }
 }
